@@ -1,0 +1,81 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Adapted from Gilles Castel's work: https://github.com/gillescastel/masterthesis 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\documentclass[working]{tuftebook}
+
+\input{setup/preamble.tex}
+\input{setup/commands.sty}
+\input{setup/symbols.tex}
+
+\usepackage{lipsum}
+\usepackage{pdfpages} % possibly include external front/back-cover pages
+\usepackage{parskip}
+\usepackage{titletoc}
+
+\newcommand\circled[1]{
+    \begin{tikzpicture}[baseline=(char.base)]%
+        \node[circle,draw,inner sep=1pt] (char) {\textsf{#1}};%
+\end{tikzpicture}}
+% minicircle for in figures!
+\newcommand\mc[1]{\footnotesize\circled{#1}}
+
+%%%%%%%% FONT CUSTOMIZATION %%%%%%%% 
+% Computer Modern Bright font: https://tug.org/FontCatalogue/computermodernbright/
+\usepackage{cmbright} 
+% Palatino font
+% \usepackage{mathpazo} 
+
+% \usepackage{eso-pic}                % put things into background 
+
+% \definecolor{reallylightgray}{HTML}{FAFAFA}
+% \AddToShipoutPicture{% from package eso-pic: put something to the background
+%     \ifthenelse{\isodd{\thepage}}{
+%           % ODD page: left bar
+%           \AtPageLowerLeft{% start the bar at the left bottom of the page
+%             \put(\LenToUnit{\dimexpr\paperwidth-222pt},0){% move it to the top right
+%                 \color{reallylightgray}\rule{222pt}{297mm}%
+%               }%
+%           }%
+%       }%
+%       {%
+%         \AtPageLowerLeft{% put it at the left bottom of the page
+%           \color{reallylightgray}\rule{222pt}{297mm}%
+%         }%
+%    }%
+% }
+
+
+\begin{document}
+
+\input{titlepage}
+
+\renewcommand{\thepage}{\roman{page}}
+% front cover
+% \includepdf[pages=1, fitpaper=true]{./kuleuven-template/covers.pdf}
+
+\thispagestyle{empty}
+\input{copyright.tex}
+\pagestyle{plain}
+\setcounter{page}{0}
+%\input{chapters/preface.tex}
+\input{chapters/summary.tex}
+%\listofsymbols
+\tableofcontents
+\cleardoublepage
+\renewcommand{\thepage}{\arabic{page}}
+\setcounter{page}{1}
+\pagestyle{normal}
+\input{chapters/chapter0.tex}
+\input{chapters/chapter1.tex}
+\input{chapters/chapter2.tex}
+\input{chapters/chapter3.tex}
+%\input{chapters/exercises}
+
+
+\printbibliography[heading=bibintoc]
+
+% back cover
+% \includepdf[pages=2, fitpaper=true]{./kuleuven-template/covers.pdf}
+\end{document}

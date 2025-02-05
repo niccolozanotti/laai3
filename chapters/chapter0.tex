@@ -1,0 +1,207 @@
+\setcounter{chapter}{-1}
+\chapter{Mathematical Preliminaries}
+\label{ch:mathematical-preliminaries}
+
+The notation we will adopt closely follows the one in~\citet{Arora2009}\sidecite{Arora2009}.
+
+\section*{Standard notation}
+We let $\Z = \{0,\pm1,\pm2,\ldots\}$ denote the set of integers, and
+$\N$ denote the set of natural numbers (i.e., nonnegative integers).
+A number denoted by one of the letters $i,j,k,\ell,m,n$ is always assumed to be an integer.
+If $n \geq 1$, then \oneton{n} denotes the set $\{1,\ldots,n\}$.
+For a real number $x$, we denote by \ceil{x} the smallest $n \in \mathbb{Z}$ such that $n \geq x$ (ceiling function) and by \floor{x} the largest $n \in \Z$ such that $n \leq x$.
+Whenever we use a real number in a context requiring an integer, the operator $\lceil \ \rceil$ is implied.
+
+We denote by $\log x$ the logarithm of $x$ to the base 2.
+
+We say that a condition $P(n)$ holds for \emph{sufficiently large} $n$ if there exists some number $N$
+such that $P(n)$ holds for every $n > N$ (for example, $2^n > 100n^2$ for sufficiently large $n$).
+We use expressions such as $\sum_i f(i)$ (as opposed to, say, $\sum_{i=1}^n f(i)$) when the range
+of values $i$ takes is obvious from the context.
+If $u$ is a string or vector, then $u_i$ denotes the value of the $i^{\text{th}}$ symbol/coordinate of $u$.
+
+
+\section*{Strings}
+
+\begin{definition}[String]
+	Let $S$ be a finite set. A string over the alphabet $S$ is a finite, possibly empty, tuple of elements of $S$. We employ the following notation
+	\begin{align*}
+		 & S^n \doteq \{ \text{set of all strings over $S$ of length exactly } n \in \mathbb{N} \}; \\
+		 & S^0 \doteq \varepsilon \  \text{is the empty string};                                    \\
+		 & S^* \doteq \{ \text{set of all strings} \} = \cup_{n\geq0}S^n \, .
+	\end{align*}
+\end{definition}
+In this course we will typically consider strings over the \emph{binary} alphabet $S = \{0,1\}$.
+If $x$ and $y$ are strings, then we denote their concatenation (the tuple that contains first the elements of $x$ and then the elements of $y$) by $x \circ y$ or sometimes simply $xy$. The set of strings forms a monoid with the concatenation operation (associativity + $\varepsilon$ as identity element).
+If $x$ is a string and $k \geq 1$ is a natural number, then $x^k$ denotes the concatenation of $k$ copies of $x$.
+For example, $1^k$ denotes the string consisting of $k$ ones.
+The length of a string $x$ is denoted by $|x|$.
+
+\section*{Additional notation}
+If $S$ is a distribution then we use $x \indist{S}$ to say that $x$ is a random variable that is distributed according to $S$; if $S$ is a set then this denotes that $x$ is distributed uniformly over the members of $S$. We denote by $U_n$ the uniform distribution over $\{0,1\}^n$. For two length-$n$ strings $x,y \in \{0,1\}^n$, we denote by $x \odot y$ their dot product modulo 2; that is $x \odot y = \sum_i x_iy_i \pmod{2}$. In contrast, the inner product of two $n$-dimensional real or complex vectors $\bm{u},\bm{v}$ is denoted by $\langle\bm{u},\bm{v}\rangle$ (see Section A.5.1). For any object $x$, we use $\lfloor x \rfloor$ (not to be confused with the floor operator $\lfloor x \rfloor$) to denote the representation of $x$ as a string (see Section 0.1).
+
+\section{Representing objects as strings}\label{sec:str-representation}
+
+The basic computational task considered in this book is \emph{computing a function}. In fact, we will typically restrict ourselves to functions whose inputs and outputs are finite \emph{strings of bits} (i.e., members of $\{0,1\}^*$).
+
+\subsection*{Representation}
+Considering only functions that operate on bit strings is not a real restriction since simple encodings can be used to \emph{represent} general objects---integers, pairs of integers, graphs, vectors, matrices, etc.---as strings of bits. For example, we can represent an integer as a string using the binary expansion (e.g., 34 is represented as 100010) and a graph as its adjacency matrix (i.e., an $n$ vertex graph $G$ is represented by an $n \times n$ 0/1-valued matrix $A$ such that $A_{i,j} = 1$ iff the edge $\overline{ij}$ is present in $G$). We will typically avoid dealing explicitly with such low-level issues of representation and will use $\lfloor x \rfloor$ to denote some canonical (and unspecified) binary representation of the object $x$. Often we will drop the symbols $\lfloor \rfloor$ and simply use $x$ to denote both the object and its representation.
+\subsection*{Computing functions with nonstring inputs or outputs}
+The idea of representation allows us to talk about computing functions whose inputs are not strings (e.g., functions that take natural numbers as inputs). In all these cases, we implicitly identify any function $f$ whose domain and range are not strings with the function $g : \{0,1\}^* \rightarrow \{0,1\}^*$ that given a representation of an object $x$ as input, outputs the representation of $f(x)$. Also, using the representation of pairs and tuples, we can also talk about computing functions that have more than one input or output.
+
+\section{Decision problems/languages}
+
+\begin{definition}[Language]
+	We call a \emph{language} any subset of $S^*$ where $S$ is an alphabet.
+\end{definition}
+An important special case of functions mapping strings to strings is the case of \emph{Boolean} functions\sidenote{They are also called characteristic functions.}, whose output is a single bit
+\begin{definition}[Boolean function]
+	We call Boolean function any function $f$ with $f : \binstrings \to \binset$. Any boolean function naturally identifies a language:
+	\begin{equation}
+		\mathcal{L}_f = \{ x \in \binstrings : f(x) = 1 \} \subseteq \binstrings \, .
+		\label{eq:boolean-func-language}
+	\end{equation}
+\end{definition}
+We identify the computational problem of computing $f$ (i.e., given $x$ compute $f(x)$) with the problem of deciding the language $\mathcal{L}_f$ (i.e., given $x$, decide whether $x \in \mathcal{L}_f$):
+\begin{definition}[Decision problem]
+	A decision problem for a given language $\mathcal{M}$ can be seen as the task of computing $f$ such that $\mathcal{M} = \mathcal{L}_f$.
+\end{definition}
+
+
+\begin{eg}[INDSET]
+	By representing the possible invitees to a dinner party with the vertices of a graph having an edge between any two people who don't get along, the dinner party computational problem from the introduction becomes the problem of finding a maximum sized \emph{independent set} (set of vertices without any common edges) in a given graph. The corresponding language is:
+	\[
+		\text{INDSET} = \{(G,k): \exists S \subseteq V(G) \text{ s.t. } |S| \geq k \text{ and } \forall u,v \in S, (u,v) \notin E(G)\}
+	\]
+	An algorithm to solve this language will tell us, on input a graph $G$ and a number $k$, whether there exists a conflict-free set of invitees, called an \emph{independent set}, of size at least $k$. It is not immediately clear that such an algorithm can be used to actually find such a set, but we will see this is the case in Chapter 2. For now, let's take it on faith that this is a good formalization of this problem.
+\end{eg}
+
+\section{Big-Oh notation}
+
+We will typically measure the computational efficiency of an algorithm as the number of basic operations it performs as \emph{a function of its input length}. That is, the efficiency of an algorithm can be captured by a function $T$ from the set $\mathbb{N}$ of natural numbers to itself such that $T(n)$ is equal to the maximum number of basic operations that the algorithm performs on inputs of length $n$. However, this function $T$ is sometimes overly dependant on the low-level details of our definition of a basic operation. For example, the addition algorithm will take about three times more operations if it uses addition of single digit \emph{binary} (i.e., base 2) numbers as a basic operation, as opposed to \emph{decimal} (i.e., base 10) numbers. To help us ignore these low-level details and focus on the big picture, the following well-known notation is very useful.
+\begin{definition}[Big-Oh notation]
+	Let $f,g : \N \to \N$. Then we say that
+	\begin{equation}
+		f = O(g) \text{ if } \exists c \in \mathbb{R^+} \text{ s.t. } f(n) \le c \cdot g(n) \, ,
+	\end{equation}
+	\begin{equation}
+		f = \Omega(g) \text{ if } \exists c \in \mathbb{R^+} \text{ s.t. } f(n) \ge c \cdot g(n)
+	\end{equation}
+	for sufficiently large $n$, and
+	\begin{equation}
+		f = \Theta(g) \text{ if } f= O (g) \text{ and } f = \Omega(g) \, .
+	\end{equation}
+\end{definition}
+
+\section*{Exercises}
+
+\begin{ex}
+	One maybe interested in evaluating the cardinality \(|\mathcal{L}|\) of a set \(\mathcal{L} \leq S^n\) . What is the cardinality of \(S^n\) , namely the set of all strings of length \(n \in N\) .\\
+\end{ex}
+\begin{solution}
+	\(|S^n| = |S|^n\)
+	this can be proved by induction. If one wants to be sure that a statement P(n) about natural numbers holds for all \(n \in N\) one can prove that:
+	\begin{itemize}
+		\item P(0) holds (\textbf{BASE CASE})
+		\item \(\forall n. P(n) \implies P (n+1)\) (\textbf{INDUCTIVE CASE})
+	\end{itemize}
+	In the context of our exercise, then:
+	\begin{itemize}
+		\item The base case consists in proving that \(|S^0| = |S|^0\) , this is very easy: \(|S^0| = |\{\epsilon\}| = 1 \) (the cardinality of all the function of length zero). Then we have that  \(|S|^0= 1\) because the cardinality of S is surely different from zero, so to the power of 0 it is 1.
+		\item The inductive case. We suppose \(|S^n| = |S|^n\) and we prove that \(|S^{n+1}| = |S|^{n+1}\)  : if we start from \(|S^{n+1}|= |S| |S^n|\) there are S many ways of choosing the first symbol and \(|S^n|\) ways of choosing the rest. Then we substitute  \(|S^n| = |S|^n\) and we get the result.
+	\end{itemize}
+	So we have proved that the number of element in the set of Strings of length n is exponential, where the base of the exponential is the cardinality of the alphabet.
+\end{solution}
+\begin{ex}
+	Relate the following pair of functions by way of the asymptotic operators \(O, \Omega,\Theta\) :
+	\begin{itemize}
+		\item \(f_1 (n) = n \log(n)\)
+		\item \(g_1(n) = 10 n \log (\log (n))\)
+		\item \(f_2 (n) = 1000n\)
+		\item \(g_2(n) = \frac{1}{100}n \log(n)\)
+	\end{itemize}
+\end{ex}
+\begin{solution}
+	Let use consider the first pair of functions ($f_1$ and $g_1$):
+	\[
+		\lim_{n\to\infty} \frac{f_1(n)}{g_1(n)}=\lim_{n\to\infty} \frac{ n \log(n)}{10 n\ \log (\log (n))}
+	\]
+	the $n$ goes away, also we can say that $\log(n)$ grows asymptotically faster than $\log$ ($\log(n)$) so the limit will will be  \(+\infty\) . As a consequence we can say that $f_1(n)$ is \(\Omega\)  of $g_1$. And dually $g_1(n)$ = \(O\) ($f_1(n)$).\\
+	For the second pair of functions ($f_2$ and $g_2$) :
+	\[\lim_{n\to\infty} \frac{f_1(n)}{g_1(n)}=\lim_{n\to\infty} \frac{ 1000n}{\frac{1}{100} n \log (n)} \]
+	the $n$ goes away, so it is a constant divided by $\log(n)$, so for n that goes to infinity the ration of $f_2$ and $g_2$ will go to $0$. So we have that $f_2$ is ($O(g_2)$)
+\end{solution}
+\begin{ex}
+	We would like to find appropriate encodings for the following discrete sets:
+	\begin{itemize}
+		\item A. The set $\Q$ of rational numbers
+		\item B. Disjoint union of $\N$ and \(\{0,1\}^*\) which is \(\{(l,n) | n\in N\}  \cup \{(r,s) | s \in \{0,1\}\}\)
+		\item C. Graphs, namely pairs in the form $(V,E)$ such that $V$ is a finite set of nodes and $E \subset V \times V$ is a finite set of edges
+	\end{itemize}
+\end{ex}
+\begin{solution}[A]
+	In the first it is sufficient to observe that elements of $\Q$ can be encoded as
+	\[
+		\Q = \{ (z/ n) : z \in \Z, n \in \N, n>0\} \, .
+	\]
+	So all together $(z,n)$ becomes the string: \(S_z\) (sign of z) \(m_z\) (binary encoding of the modulus of z) \(\#\) \(m_n\)(binary encoding of n):
+	\[
+		\enc{(z/n)} = S_z \ m_z \# \ m_n
+	\]
+	of course appropriately encoded in \(\{0,1\}^*\)
+\end{solution}
+\begin{solution}[B]
+	This is relative easy because in  representing disjoint unions we can encode
+	\[N \biguplus \{0,1\}\]
+	as follow :\\
+	\[(l,n) \implies 0 \cdot \enc{ n} \]
+	\[(r,s) \implies 1 \cdot S\]
+\end{solution}
+
+\begin{solution}[C]
+	There are \textbf{many} ways of representing graphs, one possibility being the following:
+	\begin{itemize}
+		\item Nodes are identified with the natural numbers between 1 and \(|V|\);
+		\item Each edge can be seen as a pair of nodes, by definition;
+		\item The whole set of edges can be represented as: \((v_1^1, v_2^1),(v_1^2, v_2^2), ..., (v_1^m, v_2^m)\) can be encoded as \(\enc{ v_1^1} \# \enc{ v_2^1} \# ... \# \enc{ v_1^m} \# \enc{ v_2^m}\) . Then the whole graph then becomes the encoding of: \((|V|, \enc{ E})\) where \(\enc{ E}\) is the encoding of the edges. Is sufficient to have only \(|V|\) because the nodes are identified by all the natural numbers between 1 and \(|V|\).
+	\end{itemize}
+\end{solution}
+
+\begin{ex}
+	Given
+	\[S = \{w \in \{0,1\}^* |\  |w| : n, n \geq 2, w\ \text{begin and ends with 1} \}\]
+	what is the cardinality of S (\(|S|\))?
+\end{ex}
+\begin{solution}
+	We know that the cardinality of a set of String of length n with an alphabet with only two element is  \(2^n\). If we know that the first and the last element of the string are always 1 then I have to subtract \(2^2\) so in the end the cardinality will be : \(|S| = 2^{n-2}\)
+\end{solution}
+\begin{ex}
+	Given
+	\[S = \{w \in \{0,1\}^* |\   |w| \leq n\}\]what is the cardinality of $S$?
+\end{ex}
+\begin{solution}
+	The cardinality of $S$ will be the union of the cardinality of of the set \(\{0,1\}^m\) with \(m \leq n\). The cardinality of the union of two set is the sum of the cardinality of the sets:
+	\[
+		\left\lvert A \cup B \right \rvert = |A| + |B|
+	\]
+	so we will have that
+	\[
+		\strlen{\bigcup_{m\leq n} \{0,1\}^m} = \sum_{m \leq n} \strlen{\{0,1\}^m} = \sum_{m=0}^n 2^m \, .
+	\]
+\end{solution}
+\begin{ex}
+	Given
+	\[
+		\lang{S} = \{w \in \binstrings :   |w| = n, \ n \geq  0, \ w \text{ is palindrome} \}
+	\]
+	find the cardinality of S.
+\end{ex}
+\begin{solution}
+	We analyze two distinct cases, the first is when the length of the string is even and the second is when is odd.\\
+	In the even case we have that the string will be formed by two parts: $w = u \odot \tilde{u}$ where $\tilde{u}$ is the reversed version of string $u$ (e.g. $0110$).
+	In this case if we call $k$ the length of $u$ then we have that \(u \in \{0,1\}^k\) and $n= 2k$.
+	So the cardinality of $S$ in this case will be \(|S| = 2^{n/2}\). \\
+	In the odd case we have that the string will be formed as: $w = u \odot 0 \odot \tilde{u}$ or $w=u \odot 1 \odot \tilde{u}$.
+	So we will have to find the cardinality of the union of these two sets. Each of them has a cardinality of \(2^k\) so if we sum them we obtain \(2 \times 2^k\) that is \(2^{k+1}\) . But $n=2k+1$ so \(k= \frac{n-1}{2}\) so the cardinality of $S$ will be : \(|S| = 2^{(n-1)/2 +1} = 2^{(n+1)/2}\).
+\end{solution}
+

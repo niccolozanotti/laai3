@@ -1,0 +1,108 @@
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{textcomp}
+
+\usepackage{url}
+\usepackage{listings} % line breaks for code
+\usepackage[mode=buildnew]{standalone} % to include tikz figs precompiled
+\usepackage{eucal} %mathscr
+
+\RequirePackage[style=authoryear,
+	backend=biber,
+	natbib=true,
+	maxcitenames=2,
+	mincitenames=1,
+	dashed=false,
+	isbn=false,
+	url=false,
+	eprint=false,
+	doi=false,
+	uniquelist=minyear % prevent issue for references of the same first author (even in different years)
+]{biblatex}
+\addbibresource{bibliography.bib} % The filename of the bibliography
+
+\usepackage[autostyle=true]{csquotes} % Required to generate language-dependent quotes in the bibliography
+
+\usepackage{hyperref}
+\hypersetup{
+	colorlinks=true,
+	linkcolor=blue,
+	filecolor=magenta,
+	urlcolor=magenta,
+	citecolor=blue,
+}
+\usepackage[noabbrev]{cleveref}
+
+% Adds Bibliography, ... to Table of Contents
+\usepackage[nottoc]{tocbibind}
+
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage[usenames,dvipsnames,svgnames]{xcolor}
+
+% \usepackage{cmbright}
+
+\usepackage{amsmath, amsfonts, mathtools, amsthm, amssymb}
+\usepackage{mathrsfs}
+\usepackage{cancel}
+
+
+\usepackage{tikz}
+\usepackage{tikz-cd}
+
+% theorems
+\usepackage{setup/theorems}
+
+\makeatother
+
+% figure support (https://castel.dev/post/lecture-notes-2)
+\usepackage{import}
+\usepackage{xifthen}
+\pdfminorversion=7
+\usepackage{pdfpages}
+\usepackage{transparent}
+
+
+\makeatletter
+\newif\ifworking
+\@ifclasswith{tuftebook}{working}{\workingtrue}{\workingfalse}
+\makeatother
+
+\newcommand{\incfig}[2][1]{%
+	% \ifworking{\makebox[0pt][c]{\color{gray}{\scriptsize\textsf{#2}}}}\fi%
+	\def\svgwidth{#1\textwidth}
+	\import{./figures/}{#2.pdf_tex}
+}
+
+\newcommand{\fullwidthincfig}[2][0.90]{%
+	% \ifworking{\makebox[0pt][l]{\color{gray}{\scriptsize\textsf{#2}}}}\fi%
+	\def\svgwidth{#1\paperwidth}
+	\import{./figures/}{#2.pdf_tex}
+}
+
+
+\newcommand{\minifig}[2]{%
+	\def\svgwidth{#1}%
+	\begingroup%
+	\setbox0=\hbox{\import{./figures/}{#2.pdf_tex}}%
+	\parbox{\wd0}{\box0}\endgroup%
+	\hspace*{0.2cm}
+}
+
+% %http://tex.stackexchange.com/questions/76273/multiple-pdfs-with-page-group-included-in-a-single-page-warning
+\pdfsuppresswarningpagegroup=1
+
+\newcommand\todo[1]{\ifworking {{\color{red}{#1}}} \else {}\fi}
+\newcommand\charlotte[1]{\ifworking {{\color{blue}{#1}}} \else {}\fi}
+
+\author{Niccolò Zanotti}
+
+
+\usepackage{multirow}
+\def\block(#1,#2)#3{\multicolumn{#2}{c}{\multirow{#1}{*}{$ #3 $}}}
+
+% \overfullrule=1mm
+
+\newenvironment{myproof}[1][\proofname]{%
+	\proof[\rm \bf #1]%
+}{\endproof}

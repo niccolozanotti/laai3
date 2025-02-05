@@ -1,0 +1,369 @@
+\chapter{The Computational Model}\label{ch:computational-model}
+
+Giving positive results about the feasibility of a computational task\sidenote{We recall from~\secref{\ref{sec:str-representation}} that for us a task is thought of as the problem of computing a function $f: \binstrings \to \binset$} is, in principle, straightforward: implement an algorithm solving the task on a machine powerful enough. However this reveals to be a shortsighted approach as one would not be able to prove the opposite, i.e. the impossibility to solve a certain task of a computational task by showing it is not feasible on the available concrete machines. We therefore want to develop a \emph{model} of computation.
+
+Such model is defined in the form of an abstract machine (1) as simple as possible and (2) able to simulate all physically realistic machines.
+The universally accepted model of computation is the so-called ``Turing Machine'' originated from Alan Turing.
+
+\section{The Turing Machine}\label{sec:turing-machine}
+
+In order to give a formal definition of the Turing model of computation we need to lay out some concepts and notation.
+
+The \textbf{scratchpad}(s) consist(s) of $k$ \emph{tapes}, where a tape is an infinite $1-$directional line of cells, each holding a symbol from a finite alphabet $\Gamma$. We call $\Gamma$ the \emph{alphabet} of the machine. Each of the tapes has a head, i.e. a pointer to a cell or, mathematically, a natural number specifying how far from the left-most cell we currently are (at that stage of the computation).
+The head can read or write one symbol at a time from or to the tape. It can move left or right.
+Some tapes are read-only, the input tapes. The last tape(s) can be taken as the output tape(s) containing the result of the computation.
+If those tapes are absent, the result of the computation is either $0$ or $1$ based on the final state reached by the machine.
+
+As for the \textbf{instructions}, we call $\mathcal{Q}$ the \emph{finite} set of states the machine can be in.
+A state provides the internal description of part of the machine.
+At each step the machine performs the following operations
+\begin{enumerate}
+	\item Reads the symbols under the $k$ tape heads;
+	\item For the $k-1$ read-write tapes, replaces the symbol with a new one or leaves it unchanged;
+	\item Changes its state to a new one;
+	\item Moves each of the $k$ tape heads to the left/right/stay in place.
+\end{enumerate}
+This is a very simple yet expressive model.
+
+\begin{note}
+	The set of states $\mathcal{Q}$ is different from the set of configurations which can be infinite (see Def.~\ref{def:configuration-tm}).
+\end{note}
+
+We now give the formal definition of a Turing Machine.
+
+\begin{definition}[Turing Machine]
+	A Turing Machine (TM) working on $k$ tapes is described as a triple $(\Gamma, \mathcal{Q}, \delta)$ containing
+	\begin{itemize}
+		\item A finite set \(\Gamma\) of tape symbols, which we assume contains the blank symbol \blank , the start symbol \start , and the binary digits $0$ and $1$;
+		\item A finite set \(\mathcal{Q}\) of states which includes a designated initial state \(q_{init}\) and a designated final state \(q_{halt}\);
+		\item A \textbf{transition function}\sidenote{$\delta$ has a table representation. This can be huge for certain machines, nevertheless finite.} \(\delta\) that defines the instructions regulating the functioning of the machine at each step:
+		      \begin{equation}
+			      \delta : \mathcal{Q} \times \Gamma^k \rightarrow \mathcal{Q} \times \Gamma^{k-1} \times \{L,S,R\}^k \, .
+			      \label{eq:transition-function-def}
+		      \end{equation}
+		      where $\Gamma^k$ specifies the symbols under the $k$ heads, $\Gamma^{k-1}$ indicates the next symbols under the writeable heads (input tape stays the same) and the tuple $\{L,S,R\}^k$ specifies the heads movements (left, right or stay in place).
+	\end{itemize}
+	\label{def:turing-machine}
+\end{definition}
+\begin{note}
+	When the first parameter is the halting state $q_{halt}$, then $\delta$ cannot touch the tapes nor the heads:
+	\[
+		(q_{halt}, (\sigma_1, \ldots, \sigma_k) ) \overset{\delta}{\mapsto}  (q_{halt}, (\sigma_2, \ldots, \sigma_k), (S, \ldots, S))
+	\]
+	and the machine is stuck.
+\end{note}
+\begin{definition}[Configuration of a TM]
+	Given a Turing Machine, $\mathcal{M} = (\Gamma, \mathcal{Q}, \delta)$ working on $k$ tapes, a configuration consists of
+	\begin{itemize}
+		\item The current state $q$;
+		\item The contents of the $k$ tapes;
+		\item The positions of the $k$ tape heads;
+	\end{itemize}
+	one such configuration will be denoted with $C$.
+	\label{def:configuration-tm}
+\end{definition}
+\begin{definition}[Initial/Final configuration]
+	We indicate with $\mathcal{I}_x$ the \emph{initial} configuration for input $x \in \binstrings$ consisting of
+	\begin{itemize}
+		\item $q_{init}$;
+		\item first tape: \start $x$ \blank \ldots \blank , other tapes: \start \blank \ldots \blank ;
+		\item tapes heads all positioned on the $\start$ symbol.
+	\end{itemize}
+	A \emph{final} configuration for output $y \in \binstrings$ is any configuration whose current state is $q_{halt}$ and output tape $\start y \blank \dots \blank$.
+\end{definition}
+
+
+\subsection{Machine computations}
+
+The transition function naturally determines the unfolding of successive configurations.
+\begin{definition}
+	We say that the TM $\mathcal{M}$ returns $y \in \binstrings$ on input $x \in \binstrings$ in $t$ \emph{steps} if
+	\[
+		\mathcal{I}_x \overset{\delta}{\mapsto} C_1 \overset{\delta}{\mapsto} \dots \overset{\delta}{\mapsto} C_t
+	\]
+	where $C_t$ is a final configuration for $y$. We then write $y = \mathcal{M}(x)$.
+\end{definition}
+\begin{definition}[Computable function]
+	Let $\mathcal{M}$ be a Turing Machine. We say $\mathcal{M}$ computes a function $f: \binstrings \to \binstrings$ if and only if $\forall x \in \binstrings \mathcal{M}(x) = f(x)$. If that is the case, $f$ is said to be \emph{computable}.
+	\label{def:computable-function}
+\end{definition}
+
+\subsection{Machine efficiency, runtime}
+
+\begin{definition}[Computing a function and running time]
+	A TM \(\mathcal{M}\) computes a function \(f:\{0,1\}^* \rightarrow \{0,1\}^*\) in time \(T : \N \to \N\) iff \(\mathcal{M}\) returns $f(x)$ on input x in a number of steps smaller or equal to \(T(|x|)\) for every \(x \in \{0,1\}^*\) , in this case $f$ is said to be \textbf{computable} in time $T$.
+	\label{def:function-runinng-time}
+\end{definition}
+
+\begin{definition}
+	A language \(\mathcal{L}_f \subseteq \{0,1\}^*\) is \textbf{decidable} in time $T$ iff $f$ is computable in time $f$.
+	\label{def:deciable-language}
+\end{definition}
+
+\begin{eg}
+	The set of palindrome words is decidable in time $T(n) = 3n$. Computing the parity of binary strings requires time $T(n) = n+2$.
+\end{eg}
+
+\begin{definition}[Time-constructible function]
+	A function $f : \N \to \N$ is time constructible if $T(n) \ge n$ and there is a TM $\mathcal{M}$ that computes the function $x \mapsto \enc{T(\strlen{x})}$ in time $T(n)$.
+\end{definition}
+
+\begin{remark}[Definition robustness]
+	The definition of the model given here may be subject to many tweaks.
+	It is a simple exercise to see that most changes to the definition do not yield a substantially
+	different model, since our model can simulate any of these new models. In context of
+	computational complexity, however, we have to verify not only that one model can
+	simulate another,but also that it can do so efficiently.
+	However as long as we are willing to ignore polynomial factors in the running time (which might be raised if restricting the alphabet,reducing to one tape or allowing the tapes to be infinite in both directions\sidenote{See Section 1.3.1. of \citet{Arora2009} for proofs.}
+	we are just fine with the model \ref{def:turing-machine}.
+\end{remark}
+%%%%%%%%%%%%
+\subsection{Machines as strings}
+
+Since the behavior of a TM $\mathcal{M}$ is determined by $\delta$ we may well use the list of all inputs and outputs of this function and encode those as as \binstrings effectively yielding a representation $\enc{\mathcal{M}}$.
+
+It is of technical usefulness\sidenote{See Section 1.3.1. of \citet{Arora2009}} to make the following assumptions
+\begin{itemize}
+	\item $\forall x \in \binstrings, \exists \mathcal{M} : x = \enc{M}$;
+	\item Every TM $\mathcal{M}$ is represented by infinitely many strings; however one is the ``canonical'' representation which we indicate with $\enc{\mathcal{M}}$.
+\end{itemize}
+
+\begin{theorem}[Efficient Universal Turing Machine]
+	There exists a TM $\mathcal{U}$ such that for every  $x, \alpha \in \binstrings, \mathcal{U}(x,\alpha) = \mathcal{M}_{\alpha}(x)$ where $\mathcal{M}_{\alpha}$ denotes the TM represented by $\alpha$.\\
+	Moreover if $\mathcal{M}_{\alpha}$ halts on input $x$ within $T$ steps then $\mathcal{U}(x, \alpha)$ halts withing $CT \log(T)$ steps, where $C$ is independent of $\strlen{x}$ and depends only on $\mathcal{M}_{\alpha}$.
+\end{theorem}
+
+To give a general proof one has to encode configurations of Turing Machines as
+strings, and prove that $\mathcal{U}$ can simulate $\mathcal{M}_{\alpha}$ for every
+$alpha$.
+
+\section{Uncomputability}
+
+\begin{theorem}[Uncomputable functions exist]
+	There exists a function $\UC : \binstrings \to \binset$ that is not computable by any Turing Machine.
+	\label{thm:uc-uncomputability}
+\end{theorem}
+\begin{proof}
+	It suffices to consider the function
+	\begin{equation}
+		\UC (\alpha) =
+		\begin{cases}
+			0 \quad \text{if } \mathcal{M}_{\alpha} = 1 \\
+			1 \quad \text{otherwise}
+		\end{cases} \, .
+		\label{eq:uc-function}
+	\end{equation}
+	If $\UC$ were computable, there would be a TM $\mathcal{M}$ such that $\mathcal{M}(\alpha) = \UC(\alpha), \forall \alpha \in \binstrings$ according to Def.~\ref{def:computable-function} and, in particular, when $\alpha = \enc{\mathcal{M}_{\alpha}}$. This, however, would be a contradiction since, by
+	\eq{\ref{eq:uc-function}}
+	\[
+		\UC(\enc{\mathcal{M}}) = 1 \iff \mathcal{M}(\enc{\mathcal{M}}) \neq 1 \iff \UC(\enc{\mathcal{M}}) = 0
+	\]
+\end{proof}
+
+\subsection{The halting problem}
+
+Let's consider a more interesting function, the \emph{halt} function
+\begin{equation}
+	\HALT(\enc{(\alpha, x)}) =
+	\begin{cases}
+		1 \quad \text{if } \mathcal{M}_{\alpha} \text{halts on input } x \\
+		0 \quad \text{otherwise}
+	\end{cases}
+	\label{eq:halt-function}
+\end{equation}
+Being able to compute such a function would mean being able to check whether an algorithm terminates or not.
+
+\begin{theorem}[Uncomputability of \HALT]
+	The halt function \ref{eq:halt-function} is not computable by any Turing Machine.
+	\label{thm:halt-uncomputability}
+\end{theorem}
+\begin{proof}
+
+	Suppose, for the sake of contradiction, that there was a TM $\mathcal{M}_{\HALT}$ computing \HALT. We will use $\mathcal{M}_{\HALT}$ to show a TM $\mathcal{M}_{\UC}$ computing \UC, contradicting Theorem~\ref{thm:uc-uncomputability}.
+
+	The TM $\mathcal{M}_{\UC}$ is simple: On input $\alpha$, $\mathcal{M}_{\UC}$ runs $\mathcal{M}_{\HALT}(\alpha, \alpha)$. If the result is 0 (meaning that $M_\alpha$ does not halt on $\alpha$), then $\mathcal{M}_{\UC}$ outputs 1. Otherwise, $\mathcal{M}_{\UC}$ uses the universal TM $\mathcal{U}$ to compute $b = \mathcal{M}_\alpha(\alpha)$. If $b = 1$, then $M_{\UC}$ outputs 0; otherwise, it outputs 1.
+
+	Under the assumption that $\mathcal{M}_{\HALT}(\alpha,\alpha)$ outputs \HALT$(\alpha,\alpha)$ within a finite number of steps, the TM $\mathcal{M}_{\UC}(\alpha)$ will output \UC$(\alpha)$.
+
+	% We show that, from an hypothetical Turing Machine computing halt, say $\mathcal{M}_{\HALT}$, we can get another machine, call it $\mathcal{M}_{\UC}$, such that the function $\UC$ is computed (which would lead to a contradiction since $\UC$ is uncomputable by Theorem~\ref{thm:uc-uncomputability}). The existence of $\mathcal{M}_{\HALT}$ would then be impossible in the first place.
+
+	% $\mathcal{M}_{\UC}$ uses $\mathcal{M}_{\HALT}$ as a subroutine as follows:
+	% \begin{itemize}[noitemsep,topsep=0pt,parsep=0pt,partopsep=0pt]
+	%     \item Given the input code $\alpha$ of a Turing machine, $\mathcal{M}_{\UC}$ proceeds by calling $\mathcal{M}_{\HALT}$ and feeding it with $(\alpha, \alpha)$;
+	%     \item $\mathcal{M}_{\UC}$ then waits until $\mathcal{M}_{\HALT}$ returns a result
+	%         \begin{itemize}[noitemsep,topsep=0pt,parsep=0pt,partopsep=0pt]
+	%             \item if $\mathcal{M}_{\HALT}(\alpha, \alpha)=0$ (i.e. $\mathcal{M}_{\alpha}(\alpha)$ does not terminate $\to \mathcal{M}_{\UC}$ returns $1$;
+	%             \item if $\mathcal{M}_{\HALT}(\alpha, \alpha)=0$ (i.e. $\mathcal{M}_{\alpha}(\alpha)$ does not terminate $\to \mathcal{M}_{\UC}$ returns $1$;
+	%          \end{itemize}
+	% \end{itemize}
+\end{proof}
+
+\begin{remark}[Reduction technique]
+	The proof's technique to prove Theorem~\ref{thm:halt-uncomputability} is called \emph{reduction}. We have shown that the computing \UC is reducible to computing \HALT. In other terms, we showed that if there were an algorithm computing \HALT~then there would be one for \UC.
+	\label{rmk:reduction}
+\end{remark}
+\begin{remark}
+	The result \ref{thm:halt-uncomputability} can be seen as a way to reinterpret Gödel's first incompleteness theorem computationally (See Sec. 1.5.2 of~\citet{Arora2009}).
+\end{remark}
+
+\section{Semantic Languages}
+
+\begin{definition}[Semantic language]
+	A language $\lang{L} \subseteq \binstrings$ is said to be \emph{semantic} when
+	\begin{itemize}
+		\item $\forall \alpha \in \lang{L}, \exists \, \mathcal{M}$ TM such that $\alpha = \enc{M}$; and
+		\item If $\enc{\mathcal{M}} \in \lang{L}$ and $\mathcal{N}$ is a TM computing the same function as $\mathcal{M}$ then $\enc{\mathcal{N}} \in \lang{L}$.
+		      \label{def:semantic-language}
+	\end{itemize}
+\end{definition}
+\begin{remark}
+	Semantic languages can be seen as extensional properties of programs, e.g. the set of all machines computing a certain function, the set of all terminating programs, \ldots.
+
+\end{remark}
+
+\begin{definition}[Property]
+	If a language \(\lang{L}\) belongs to a semantic language \(\lang{P}\), we can say that \(\lang{L}\) satisfies the property \( P\). \\
+	$P$ is said to be \emph{non-trivial} if
+	\begin{enumerate}
+		\item \(\lang{P} \neq \emptyset\); and
+		\item \(\lang{P} \neq \{  \enc{\mathcal{M}}  | \mathcal{M} \text{ is a TM} \} \)
+	\end{enumerate}
+	$P$ is said to be \emph{extensional} if
+	\[
+		\lang{L}(\mathcal{M}) = \lang{L}(\mathcal{N}) \Rightarrow \enc{\mathcal{M}} \in P \Longleftrightarrow \enc{\mathcal{N}} \in P \, .
+	\]
+\end{definition}
+
+We have the following result regarding semantic languages:
+\begin{theorem}[Rice's Theorem]
+	Any decidable semantic language \(\mathcal{L}\) is trivial, i.e. either $\lang{L} = \emptyset$ or $\lang{L} = \binstrings$.
+	\label{thm:rice-thm}
+\end{theorem}
+\begin{remark}
+	This is a generalization of the halting problem. It implies that all non-trivial and extensional properties of a language are undecidable.
+\end{remark}
+
+To prove that a language is decidable one can
+\begin{itemize}[noitemsep,topsep=0pt,parsep=0pt,partopsep=0pt]
+	\item Construct a TM computing the function or deciding the given language;
+	\item Describe the algorithm, in an informal way, computing the function / deciding the language using only elementary operation. However evaluating the performance precisely is often hard.
+\end{itemize}
+
+To prove that a language $\lang{L}$ is \emph{undecidable} one can show that there exists a \emph{computable} mapping $\phi : \binstrings \to \binstrings$ such that
+\[
+	s \in \lang{G} \iff \phi(s) \in \lang{L}
+\]
+where $\lang{G}$ is a language known to be undecidable.
+This way an hypothetical algorithm for deciding $\lang{L}$ would be turned into one for $\lang{G}$, which cannot exist.
+Alternatively one can prove $\lang{L}$ is semantic and use Theorem~\ref{thm:rice-thm}.
+
+
+\section{Complexity classes}
+
+\begin{definition}
+	A \emph{Complexity class} is a set of tasks which can be computed within some prescribed resource bounds.
+	\label{def:complexity-class}
+\end{definition}
+It is not a set of TMs, however its definition is based on TMs.
+\begin{definition}[\DTIME~class]
+	Let $T : \N \to \N$. A language $\lang{L}$ is in the class \DTIME$(T(n))$ iff there is a TM deciding $\lang{L}$ and running in time $n \mapsto c \cdot T(n)$ for some constant $c$.
+	\label{def:dtime-class}
+\end{definition}
+
+\begin{remark}
+	The D in \DTIME~stands for ``deterministic''.
+	The class \DTIME$(T(n))$ would define classes of problems that are not robust, i.e. they depend too much on the underlying model. Therefore the need for a larger class to study efficiently solvable tasks is clear.
+\end{remark}
+
+\section{Polynomial time computable problems}
+
+Now we can define a robust class of task that is called Class \textbf{P}.
+\begin{definition}[The class \P]
+	The class \P~is defined as
+	\begin{equation}
+		P = \bigcup_{c \geq 1} \textbf{DTIME}(n^c)
+		\label{eq:class-P}
+	\end{equation}
+	\label{def:class-P}
+\end{definition}
+The class \P~(Polynomial) includes all those languages $\lang{L}$ which can be decided by a TM working in polynomial time.
+Indeed for any polynomial $P(n)$
+\[
+	\exists c,d>0, \bar{n} \in \Z \text{ s.t. } n> \bar{n} \implies P(n) \le c \cdot n^d \, .
+\]
+\begin{remark}
+	\P~is generally considered as the class of efficiently decidable languages.
+\end{remark}
+\begin{remark}[Robustness of \P]
+	The class \P~is closed under most of operations performed on programs, e.g. composition, bounded loops, \dots
+	As a consequence it is fairly easy to prove a problem to be in \P: it is sufficient to provide an algorithm solving it working in polynomial time (without the need to construct the TM explicitly).
+
+	The exponents $c$ bounding the running time of any machine deciding a language $\lang{L} \in \P$ can be be, in principle, huge. For most of problems of practical interest, however, $c$ is relatively small.
+\end{remark}
+
+\section{The Church-Turing Thesis}
+
+The Church-Turing Thesis is an hypothesis that has near-universal acceptance (but it cannot be formally proven):
+\begin{claim}[Church--Turing Thesis]
+	Every physically realizable computer can be simulated by a TM with overhead in time. The class of computable tasks would not be larger (actually, equal!) if formalized in a realistic way, but different.
+	\label{claim:church-turing-th}
+\end{claim}
+\begin{remark}(Why the computation model does not matter)
+	The Church--Turing statement suggests that every physically realizable computational device -- whether it's based on silicon, DNA, neurons or some other alien technology -- can be simulated by a Turing machine.
+	This implies that the set of \emph{computable} problems would be no larger on any other computational model that on the TM. Thus the underlying model of computation does not matter in this sense.
+\end{remark}
+However when it comes to \emph{efficiently} computable problems the situation is less clear.
+The stronger version of the statement~\ref{claim:church-turing-th} reads:
+\begin{claim}[Strong Church-Turing Thesis]
+	Every physically realizable computer can be simulated by a TM with a polynomial overhead in time.
+	In this view, the class \P~would stay the same even with a different model of computation.
+	\label{claim:strong-church-turing-th}
+\end{claim}
+The statement~\ref{claim:strong-church-turing-th} attributes a strong robustness to the class \P.
+However it is more controversial due to possible developments in e.g. quantum computation.
+
+\section{The complexity class FP}
+Sometimes one would like to classify functions rather than languages. This can be done by slightly generalizing a couple of concepts we have previously introduced. \\
+\begin{definition}[\FDTIME~class]
+	A function $f$ is said to belong to the class \(\FDTIME(T(n))\) iff exists a TM computing $f$ and running in time \(c \cdot T(n)\) for some constant $c$ and with \(T:\N \rightarrow \N \).
+	\label{def:FDTIME-class}
+\end{definition}
+
+\begin{definition}[\FP~class]
+	The class \FP~is defined as:
+	\begin{equation}
+		\FP = \bigcup_{c \geq 1} \FDTIME(n^c)
+		\label{eq:FP-class}
+	\end{equation}
+	\label{def:FP-class}
+\end{definition}
+\begin{remark}
+	\FP~is a kind of generalization of \P.
+	If a language \(\lang{L} \in \P \) then the characteristic function $f$ of $\lang{L}$ is trivially in \FP.
+	However the contrary is not necessarily true: if \(f \in \FP\) does not imply \(\lang{L}_f \in \P \).
+	There are canonical ways of turning a function $f$ into a language $\lang{L}_f$ based on which class of functions $f$ belongs to, e.g. optimization function, \ldots.
+\end{remark}
+
+
+\section{The class EXP}
+
+The next class of functions, beyond the polynomials, that have nice closure properties is the class of exponential functions.
+\begin{definition}[\EXP~class]
+	The class \EXP~is defined as
+	\begin{equation}
+		\EXP = \bigcup_{c \geq 1} \DTIME(2^{n^c})
+		\label{eq:class-EXP}
+	\end{equation}
+	\label{def:class-EXP}
+\end{definition}
+\begin{definition}[\FEXP~class]
+	The class \FEXP~is defined as follows:
+	\begin{equation}
+		\FEXP = \bigcup_{c \geq 1} \FDTIME(2^{n^c})
+		\label{eq:class-FEXP}
+	\end{equation}
+	\label{def:class-FEXP}
+\end{definition}
+Of course it holds that: \(\P \subseteq \EXP\) and \(\FP \subseteq \FEXP\).
+
+
