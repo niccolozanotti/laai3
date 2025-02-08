@@ -19,7 +19,6 @@
 \let\implies\Rightarrow
 \let\impliedby\Leftarrow
 \let\iff\Leftrightarrow
-\let\epsilon\varepsilon
 
 %%% Commands specific to THEORY OF COMPUTATION notes
 \newcommand\enc[1]{\ensuremath{\llcorner #1 \lrcorner}}
@@ -34,6 +33,9 @@
 \newcommand\strlen[1]{\ensuremath{\left \lvert #1 \right \rvert}} %lenght of a binary string
 \newcommand\blank{\ensuremath{\square}}
 \newcommand\start{\ensuremath{\rhd}}
+\newcommand{\fail}{\bm{\times}}
+\newcommand{\success}{\checkmark}
+\renewcommand{\epsilon}{\varepsilon}
 \newcommand\karpred{\ensuremath{\leq_p}} % karp-reducible
 \newcommand{\HALT}{\ifmmode\mathtt{HALT}\else\texttt{HALT}\fi}
 \newcommand{\UC}{\ifmmode\mathtt{UC}\else\texttt{UC}\fi}
@@ -49,10 +51,11 @@
 \newcommand{\kSAT}[1]{\ifmmode\mathtt{#1SAT}\else\texttt{#1SAT}\fi}
 \newcommand{\INDSET}{\ifmmode\mathtt{INDSET}\else\texttt{INDSET}\fi}
 \newcommand{\CLIQUE}{\ifmmode\mathtt{CLIQUE}\else\texttt{CLIQUE}\fi}
-\newcommand{\kCLIQUE}[1]{\ifmmode\mathtt{#1 CLIQUE}\else\texttt{#1 CLIQUE}\fi}
+\newcommand{\kCLIQUE}[1]{\ifmmode\mathtt{#1CLIQUE}\else\texttt{#1CLIQUE}\fi}
 \newcommand{\COL}{\ifmmode\mathtt{COL}\else\texttt{COL}\fi}
 \newcommand{\kCOL}[1]{\ifmmode\mathtt{#1 COL}\else\texttt{#1 COL}\fi}
 \newcommand{\SUBSETSUM}{\ifmmode\mathtt{SUBSETSUM}\else\texttt{SUBSETSUM}\fi}
+\newcommand{\NODECOVER}{\ifmmode\mathtt{NODECOVER}\else\texttt{NODECOVER}\fi}
 
 
 
