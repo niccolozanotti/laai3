@@ -1,10 +1,10 @@
 repos:
   - repo: local
     hooks:
-      # Hook to compile LaTeX using compile.sh
+      # Hook to compile LaTeX using make
       - id: compile-tex
-        name: Compile LaTeX with compile.sh
-        entry: ./compile.sh
+        name: Compile LaTeX with make
+        entry: make notes
         language: system
         types: [tex]
         always_run: true
